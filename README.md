@@ -18,6 +18,9 @@ A complete **112-day walkthrough** for Year 1, showing **only today's tasks** �
 - Pro tips (Salmonberry reload trick, Night Market submarine fish)
 - Tomorrow's preview so you can prepare
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/cc75df68-c59e-453b-8b1e-1be54c87a87f" />
+
+
 ### 🎯 Smart Daily Suggestions (Hoy Tab)
 Every suggestion is **tied to an incomplete achievement** — no generic tips:
 - 💰 Money achievements → seasonal earning strategies
@@ -26,6 +29,9 @@ Every suggestion is **tied to an incomplete achievement** — no generic tips:
 - ⭐ Skill achievements → which skills are below level 10
 - 🍳 Cooking / 🔨 Crafting / 🏛️ Donation achievements → specific tips
 - Completed categories automatically hide
+
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/2173df2e-da71-45b3-a962-e0ef7dc5433e" />
+
 
 ### 🐟 Fish Guide (Pesca Tab)
 Full list of catchable fish **right now**, filtered by current season and weather:
@@ -48,31 +54,7 @@ Full list of catchable fish **right now**, filtered by current season and weathe
 - Exact progress values (e.g., "23,500/25,000 (94%)")
 - ✅ Completed achievements marked
 
----
-
-## 📸 Screenshots
-
-Press **F8** in-game to open the tracker:
-
-```
-┌──────────────────────────────────────────────────────┐
-│  [Guia]  [Hoy]  [Pesca]  [Amistad]  [Logros]        │
-├──────────────────────────────────────────────────────┤
-│ 📋 GUIA DEL DIA — Primavera 13 (Sat), Año 1         │
-│ ═══════════════════════════════════════               │
-│                                                      │
-│ ⭐⭐ EGG FESTIVAL — DÍA CRÍTICO.                     │
-│ 🌱 ANTES: Cosecha TODO. Guarda 1 Cauliflower.       │
-│ 🎪 Compra TODAS las Strawberry Seeds posibles.       │
-│ 🌱 DESPUÉS: Planta TODO + Speed-Gro en 20 plantas.  │
-│ ⚠️ Riega esas 20 plantas TODOS LOS DÍAS.            │
-│                                                      │
-│ ──── Mañana ────                                     │
-│   ▹ Cumpleaños de Haley: Daffodil mejor calidad.    │
-│   ▹ Riega TODO. Compra más Parsnip Seeds.           │
-│   ... y 1 tarea más.                                │
-└──────────────────────────────────────────────────────┘
-```
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/b1f336f8-dc04-447e-b694-7037b284fb23" />
 
 ---
 
