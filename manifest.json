@@ -1,0 +1,10 @@
+{
+  "Name": "The Tracking Mod",
+  "Author": "Galaxyben",
+  "Version": "0.0.1",
+  "Description": "Rastrea tu progreso de logros de Steam/Stardew Valley y te da sugerencias diarias.",
+  "UniqueID": "Galaxyben.TheTrackingMod",
+  "EntryDll": "TheTrackingMod.dll",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": []
+}
