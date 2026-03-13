@@ -12,6 +12,7 @@ namespace MiPrimerMod
         private AchievementTracker Tracker = null!;
         private SuggestionEngine Engine = null!;
         private ModConfig Config = null!;
+        private bool IsTimeFrozen = false;
 
         public override void Entry(IModHelper helper)
         {
@@ -21,7 +22,24 @@ namespace MiPrimerMod
 
             helper.Events.GameLoop.SaveLoaded += this.OnSaveLoaded;
             helper.Events.GameLoop.DayStarted += this.OnDayStarted;
+            helper.Events.GameLoop.UpdateTicked += this.OnUpdateTicked;
             helper.Events.Input.ButtonPressed += this.OnButtonPressed;
+        }
+
+        private void OnUpdateTicked(object? sender, UpdateTickedEventArgs e)
+        {
+            if (this.IsTimeFrozen && Context.IsWorldReady && Game1.shouldTimePass())
+            {
+                Game1.gameTimeInterval = 0;
+                
+                if (Game1.currentLocation != null)
+                {
+                    foreach (var npc in Game1.currentLocation.characters)
+                    {
+                        npc.movementPause = 1;
+                    }
+                }
+            }
         }
 
         private void OnButtonPressed(object? sender, ButtonPressedEventArgs e)
@@ -39,6 +57,13 @@ namespace MiPrimerMod
                 {
                     Game1.activeClickableMenu = null;
                 }
+            }
+            else if (e.Button == this.Config.ToggleTimeKey)
+            {
+                this.IsTimeFrozen = !this.IsTimeFrozen;
+                string mensaje = this.IsTimeFrozen ? "Tiempo detenido" : "Tiempo reanudado";
+                Game1.addHUDMessage(new HUDMessage(mensaje, this.IsTimeFrozen ? HUDMessage.error_type : HUDMessage.newQuest_type));
+                this.Monitor.Log(mensaje, LogLevel.Info);
             }
         }
 

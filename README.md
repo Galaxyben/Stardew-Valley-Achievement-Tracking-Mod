@@ -77,6 +77,7 @@ Full list of catchable fish **right now**, filtered by current season and weathe
    ```
 4. Launch the game through SMAPI
 5. Press **F8** to open the tracker (configurable)
+6. Press **N** to pause/resume the passing of time, while allowing you to move freely (configurable)
 
 ---
 
@@ -86,11 +87,12 @@ After first launch, a `config.json` file is created in the mod folder:
 
 ```json
 {
-  "ToggleMenuKey": "F8"
+  "ToggleMenuKey": "F8",
+  "ToggleTimeKey": "N"
 }
 ```
 
-Change `F8` to any [SMAPI key](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) you prefer.
+Change `F8` or `N` to any [SMAPI key](https://stardewvalleywiki.com/Modding:Player_Guide/Key_Bindings) you prefer.
 
 ---
 
