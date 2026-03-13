@@ -10,12 +10,7 @@ using MiPrimerMod.Framework;
 namespace MiPrimerMod.UI
 {
     /// <summary>
-    /// Achievement Tracker menu with 5 tabs:
-    /// 1. Guía (Day-by-day Year 1 walkthrough)
-    /// 2. Hoy (Dynamic, achievement-driven daily goals)
-    /// 3. Pesca (Season/weather-specific fish guide)
-    /// 4. Amistad (Friendship tips tied to achievements)
-    /// 5. Logros (All achievements with progress bars)
+    /// Achievement Tracker menu with 5 tabs and word-wrapped text.
     /// </summary>
     public class TrackerMenu : IClickableMenu
     {
@@ -31,6 +26,7 @@ namespace MiPrimerMod.UI
         private readonly AchievementTracker Tracker;
         private readonly SuggestionEngine Engine;
 
+        // Wrapped lines (already split to fit the content width)
         private List<string> GuideLines;
         private List<string> DailySuggestions;
         private List<string> FishLines;
@@ -40,7 +36,10 @@ namespace MiPrimerMod.UI
         // ───── UI State ─────
         private int ActiveTab = TabGuide;
         private int ScrollOffset = 0;
-        private int MaxVisibleRows = 9;
+        private int MaxVisibleRows = 11;
+
+        // ───── Layout ─────
+        private int ContentWidth;
 
         // ───── Tab buttons ─────
         private readonly ClickableComponent[] tabButtons;
@@ -60,16 +59,17 @@ namespace MiPrimerMod.UI
         {
             this.Tracker = tracker;
             this.Engine = engine;
+            this.ContentWidth = this.width - 180;
 
-            // Refresh all data
+            // Refresh all data and word-wrap to fit
             this.Tracker.UpdateProgress();
-            this.GuideLines = this.Engine.GetDailyGuide();
-            this.DailySuggestions = this.Engine.GenerateDailySuggestions(this.Tracker);
-            this.FishLines = this.Engine.GetDetailedFishList(this.Tracker);
-            this.FriendshipLines = this.Engine.GetFriendshipAdvice(this.Tracker);
+            this.GuideLines = WrapLines(this.Engine.GetDailyGuide(), this.ContentWidth);
+            this.DailySuggestions = WrapLines(this.Engine.GenerateDailySuggestions(this.Tracker), this.ContentWidth);
+            this.FishLines = WrapLines(this.Engine.GetDetailedFishList(this.Tracker), this.ContentWidth);
+            this.FriendshipLines = WrapLines(this.Engine.GetFriendshipAdvice(this.Tracker), this.ContentWidth);
             this.SortedAchievements = this.Tracker.GetSortedAchievements();
 
-            // Create tab buttons (5 tabs, smaller to fit)
+            // Create tab buttons (5 tabs)
             int tabY = this.yPositionOnScreen + 12;
             int tabWidth = 120;
             int tabHeight = 44;
@@ -97,6 +97,68 @@ namespace MiPrimerMod.UI
                 Game1.mouseCursors,
                 new Rectangle(421, 472, 11, 12),
                 4f);
+        }
+
+        // ───────────────────────────────────────────
+        //  WORD WRAP — splits long lines to fit width
+        // ───────────────────────────────────────────
+        private static List<string> WrapLines(List<string> source, int maxWidth)
+        {
+            var result = new List<string>();
+            int pixelWidth = maxWidth - 20; // padding
+
+            foreach (var line in source)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    result.Add(line);
+                    continue;
+                }
+
+                // If it fits, add directly
+                if (Game1.smallFont.MeasureString(line).X <= pixelWidth)
+                {
+                    result.Add(line);
+                    continue;
+                }
+
+                // Word-wrap: split by spaces and build lines
+                string[] words = line.Split(' ');
+                string current = "";
+                bool isFirstLine = true;
+
+                foreach (var word in words)
+                {
+                    string test = string.IsNullOrEmpty(current) ? word : current + " " + word;
+
+                    if (Game1.smallFont.MeasureString(test).X > pixelWidth)
+                    {
+                        // Current line is full, emit it
+                        if (!string.IsNullOrEmpty(current))
+                        {
+                            result.Add(current);
+                            // Continuation lines get indent
+                            current = isFirstLine ? "    " + word : "    " + word;
+                            isFirstLine = false;
+                        }
+                        else
+                        {
+                            // Single word is too long — add it anyway
+                            result.Add(word);
+                            current = "";
+                        }
+                    }
+                    else
+                    {
+                        current = test;
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(current))
+                    result.Add(current);
+            }
+
+            return result;
         }
 
         // ───────────────────────────────────────────
@@ -171,24 +233,23 @@ namespace MiPrimerMod.UI
             // Content area
             int contentX = this.xPositionOnScreen + 80;
             int contentY = this.yPositionOnScreen + 110;
-            int contentWidth = this.width - 180;
 
             switch (this.ActiveTab)
             {
                 case TabGuide:
-                    DrawTextList(b, this.GuideLines, contentX, contentY, contentWidth);
+                    DrawTextList(b, this.GuideLines, contentX, contentY, this.ContentWidth);
                     break;
                 case TabDaily:
-                    DrawTextList(b, this.DailySuggestions, contentX, contentY, contentWidth);
+                    DrawTextList(b, this.DailySuggestions, contentX, contentY, this.ContentWidth);
                     break;
                 case TabFish:
-                    DrawTextList(b, this.FishLines, contentX, contentY, contentWidth);
+                    DrawTextList(b, this.FishLines, contentX, contentY, this.ContentWidth);
                     break;
                 case TabFriendship:
-                    DrawTextList(b, this.FriendshipLines, contentX, contentY, contentWidth);
+                    DrawTextList(b, this.FriendshipLines, contentX, contentY, this.ContentWidth);
                     break;
                 case TabAchievements:
-                    DrawAchievementsTab(b, contentX, contentY, contentWidth);
+                    DrawAchievementsTab(b, contentX, contentY, this.ContentWidth);
                     break;
             }
 
@@ -204,11 +265,11 @@ namespace MiPrimerMod.UI
         }
 
         // ───────────────────────────────────────────
-        //  Generic Text List (Guide, Daily, Fish, Friendship)
+        //  Generic Text List — no truncation, already wrapped
         // ───────────────────────────────────────────
         private void DrawTextList(SpriteBatch b, List<string> lines, int x, int y, int width)
         {
-            int rowHeight = 46;
+            int rowHeight = 38;
             int end = Math.Min(this.ScrollOffset + this.MaxVisibleRows, lines.Count);
 
             for (int i = this.ScrollOffset; i < end; i++)
@@ -221,35 +282,29 @@ namespace MiPrimerMod.UI
 
                 string text = lines[i];
 
-                // Truncate if too long
-                if (Game1.smallFont.MeasureString(text).X > width - 16)
-                {
-                    while (text.Length > 10 && Game1.smallFont.MeasureString(text + "...").X > width - 16)
-                        text = text.Substring(0, text.Length - 1);
-                    text += "...";
-                }
-
-                // Color-code lines by emoji/content
+                // Color-code by emoji/content
                 Color textColor = Game1.textColor;
                 if (text.Contains("🎂") || text.Contains("🎪") || text.Contains("FESTIVAL") || text.Contains("CUMPLEAÑOS"))
                     textColor = Color.Gold;
                 else if (text.Contains("🌧️"))
-                    textColor = new Color(100, 149, 237); // Cornflower blue
+                    textColor = new Color(100, 149, 237);
                 else if (text.Contains("☀️"))
                     textColor = Color.Orange;
                 else if (text.Contains("🐟") || text.Contains("🎣"))
-                    textColor = new Color(0, 191, 255);    // DeepSkyBlue
+                    textColor = new Color(0, 191, 255);
                 else if (text.Contains("──") || text.StartsWith("═"))
                     textColor = Color.LightGray;
                 else if (text.Contains("📋") || text.Contains("📖"))
-                    textColor = new Color(255, 215, 0);    // Gold header
+                    textColor = new Color(255, 215, 0);
                 else if (text.Contains("✅") || text.Contains("🏆"))
                     textColor = Color.LimeGreen;
-                else if (text.Contains("⚠️") || text.Contains("ÚLTIMO") || text.Contains("¡NO"))
+                else if (text.Contains("⚠️") || text.Contains("ÚLTIMO") || text.Contains("¡NO") || text.Contains("CRÍTICO"))
                     textColor = Color.OrangeRed;
+                else if (text.Contains("⭐"))
+                    textColor = new Color(255, 223, 100);
 
                 Utility.drawTextWithShadow(b, text, Game1.smallFont,
-                    new Vector2(x + 8, rowY + 8), textColor);
+                    new Vector2(x + 8, rowY + 6), textColor);
             }
         }
 
@@ -269,12 +324,10 @@ namespace MiPrimerMod.UI
                 Color rowBg = ach.IsUnlocked ? Color.DarkGreen * 0.25f : Color.Black * 0.12f;
                 b.Draw(Game1.fadeToBlackRect, new Rectangle(x, rowY, width, rowHeight - 4), rowBg);
 
-                // Name
                 string label = ach.IsUnlocked ? $"✅ {ach.Name}" : ach.Name;
                 Utility.drawTextWithShadow(b, label, Game1.smallFont,
                     new Vector2(x + 12, rowY + 4), ach.IsUnlocked ? Color.LimeGreen : Game1.textColor);
 
-                // Progress bar
                 if (!ach.IsUnlocked && ach.MaxValue > 0)
                 {
                     int barX = x + 12;
